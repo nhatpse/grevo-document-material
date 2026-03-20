@@ -1,5 +1,7 @@
 # Tổng Quan API
 
+Tài liệu này cung cấp cái nhìn tổng quan về toàn bộ hệ thống API của Grevo Project. Để xem chi tiết request/response của từng API, vui lòng chọn file tương ứng trong thư mục `02-api-documentation`.
+
 ## Thông Tin Chung
 
 | Thông tin | Chi tiết |
@@ -12,154 +14,72 @@
 
 ---
 
-## Headers Yêu Cầu
+## Các Module API Chi Tiết
 
-### Requests không cần xác thực
-```http
-Content-Type: application/json
-```
+Hệ thống API được chia thành các file tài liệu sau dựa trên đối tượng sử dụng:
 
-### Requests cần xác thực
-```http
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
-```
+1. **[Authentication API (Xác thực)](auth-api.md)**
+   - Đăng nhập, Đăng nhập Google, Đăng ký.
+   - Quản lý phiên làm việc (Logout).
+   - Quên mật khẩu, đặt lại mật khẩu, mã OTP.
 
-### Requests upload file
-```http
-Content-Type: multipart/form-data
-Authorization: Bearer <JWT_TOKEN>
-```
+2. **[Admin API (Quản trị viên)](admin-api.md)**
+   - Role yêu cầu: `ADMIN`.
+   - Quản lý người dùng, tài khoản doanh nghiệp.
+   - Quản lý khu vực cung cấp dịch vụ (Service Areas) và nhật ký hệ thống (System Logs).
 
----
+3. **[Citizen API (Công dân)](citizen-api.md)**
+   - Role yêu cầu: `CITIZEN`.
+   - Báo cáo rác thải, theo dõi trạng thái.
+   - Kho lưu trữ vị trí cá nhân.
+   - Theo dõi lịch sử điểm thưởng, đổi voucher quà tặng.
+   - Đánh giá chất lượng dịch vụ của nhân viên thu gom.
 
-## Danh Sách Endpoints
+4. **[Enterprise API (Doanh nghiệp)](enterprise-api.md)**
+   - Role yêu cầu: `ENTERPRISE`.
+   - Cập nhật hồ sơ doanh nghiệp, phạm vi hoạt động.
+   - Tiếp nhận báo cáo rác, phân công nhân viên (Collector).
+   - Quản lý nhân sự: duyệt đơn xin việc, duyệt phép, sa thải.
+   - Cấu hình quy tắc tính điểm báo cáo, quản lý voucher đổi điểm.
 
-### 🔐 Authentication (`/api/auth`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| POST | `/register` | Đăng ký tài khoản | ❌ |
-| POST | `/login` | Đăng nhập | ❌ |
-| POST | `/google-login` | Đăng nhập Google | ❌ |
-| POST | `/logout` | Đăng xuất | ✅ |
+5. **[Collector API (Nhân viên)](collector-api.md)**
+   - Role yêu cầu: `COLLECTOR`.
+   - Xem và phản hồi nhiệm vụ (Chấp nhận, Từ chối, Hoàn thành, Hủy).
+   - Quản lý hồ sơ cá nhân, khoang chứa rác.
+   - Tương tác với Doanh nghiệp (Xin việc, nghỉ phép, rời công ty).
 
-### 🏠 Citizen Reports (`/api/reports`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| POST | `/` | Tạo báo cáo rác mới | ✅ CITIZEN |
-| GET | `/my-reports` | Lấy danh sách báo cáo của tôi | ✅ CITIZEN |
-| GET | `/{reportId}` | Chi tiết báo cáo | ✅ CITIZEN |
-| GET | `/stats` | Thống kê công dân | ✅ CITIZEN |
-
-### 🏢 Enterprise Reports (`/api/reports`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/enterprise` | Lấy báo cáo chờ xử lý | ✅ ENTERPRISE |
-| GET | `/enterprise/history` | Lịch sử báo cáo | ✅ ENTERPRISE |
-| GET | `/enterprise/{reportId}` | Chi tiết báo cáo | ✅ ENTERPRISE |
-| GET | `/enterprise/{reportId}/eligible-collectors` | Collector phù hợp | ✅ ENTERPRISE |
-| POST | `/enterprise/{reportId}/assign` | Phân công collector | ✅ ENTERPRISE |
-| PUT | `/enterprise/{reportId}/status` | Cập nhật trạng thái | ✅ ENTERPRISE |
-
-### 🚛 Collector Tasks (`/api/collector/tasks`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách nhiệm vụ | ✅ COLLECTOR |
-| GET | `/{reportId}` | Chi tiết nhiệm vụ | ✅ COLLECTOR |
-| POST | `/{reportId}/accept` | Chấp nhận nhiệm vụ | ✅ COLLECTOR |
-| POST | `/{reportId}/reject` | Từ chối nhiệm vụ | ✅ COLLECTOR |
-| POST | `/{reportId}/complete` | Hoàn thành nhiệm vụ | ✅ COLLECTOR |
-| POST | `/{reportId}/cancel` | Hủy nhiệm vụ | ✅ COLLECTOR |
-
-### 👥 Enterprise Collector Management (`/api/enterprise/collectors`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách collector | ✅ ENTERPRISE |
-| POST | `/{collectorId}/approve` | Duyệt yêu cầu | ✅ ENTERPRISE |
-| DELETE | `/{collectorId}` | Từ chối/Xóa collector | ✅ ENTERPRISE |
-| POST | `/{collectorId}/approve-leave` | Duyệt nghỉ phép | ✅ ENTERPRISE |
-| POST | `/{collectorId}/reject-leave` | Từ chối nghỉ phép | ✅ ENTERPRISE |
-
-### ⭐ Feedback (`/api/feedback`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| POST | `/citizen/{reportId}` | Công dân đánh giá collector | ✅ CITIZEN |
-| POST | `/collector/{reportId}` | Collector đánh giá công dân | ✅ COLLECTOR |
-| GET | `/report/{reportId}` | Lấy feedback của report | ✅ |
-| GET | `/collector/{collectorId}/rating` | Rating của collector | ✅ |
-| GET | `/citizen/{citizenId}/rating` | Rating của công dân | ✅ |
-
-### 🎁 Enterprise Vouchers (`/api/enterprise/vouchers`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách voucher | ✅ ENTERPRISE |
-| POST | `/` | Tạo voucher mới | ✅ ENTERPRISE |
-| PUT | `/{voucherId}` | Cập nhật voucher | ✅ ENTERPRISE |
-| DELETE | `/{voucherId}` | Xóa voucher | ✅ ENTERPRISE |
-| GET | `/{voucherId}/redemptions` | Lịch sử đổi voucher | ✅ ENTERPRISE |
-
-### 🏆 Rewards (`/api/rewards`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/vouchers` | Voucher có sẵn | ✅ CITIZEN |
-| POST | `/redeem/{voucherId}` | Đổi voucher | ✅ CITIZEN |
-| GET | `/my-vouchers` | Voucher đã đổi | ✅ CITIZEN |
-
-### 📊 Point History (`/api/citizen/point-history`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Lịch sử điểm | ✅ CITIZEN |
-| GET | `/summary` | Tổng kết điểm | ✅ CITIZEN |
-
-### 🏅 Leaderboard (`/api/leaderboard`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Bảng xếp hạng toàn hệ thống | ✅ |
-| GET | `/area/{areaId}` | Bảng xếp hạng theo khu vực | ✅ |
-
-### 📏 Point Rules (`/api/enterprise/point-rules`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách quy tắc | ✅ ENTERPRISE |
-| GET | `/{ruleId}` | Chi tiết quy tắc | ✅ ENTERPRISE |
-| POST | `/` | Tạo quy tắc mới | ✅ ENTERPRISE |
-| PUT | `/{ruleId}` | Cập nhật quy tắc | ✅ ENTERPRISE |
-| DELETE | `/{ruleId}` | Xóa quy tắc | ✅ ENTERPRISE |
-
-### 👨‍💼 Admin Users (`/api/admin/users`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách người dùng | ✅ ADMIN |
-| PUT | `/{userId}` | Cập nhật người dùng | ✅ ADMIN |
-| DELETE | `/{userId}` | Xóa người dùng | ✅ ADMIN |
-| POST | `/{userId}/reset-password` | Reset mật khẩu | ✅ ADMIN |
-
-### 🏢 Admin Enterprises (`/api/admin/enterprises`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách doanh nghiệp | ✅ ADMIN |
-
-### 📍 Admin Service Areas (`/api/admin/service-areas`)
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/` | Danh sách khu vực | ✅ ADMIN |
-| POST | `/` | Tạo khu vực mới | ✅ ADMIN |
-| PUT | `/{areaId}` | Cập nhật khu vực | ✅ ADMIN |
-| DELETE | `/{areaId}` | Xóa khu vực | ✅ ADMIN |
+6. **[Shared API (Dùng chung)](shared-api.md)**
+   - Role yêu cầu: Tất cả or Public.
+   - Cập nhật ảnh đại diện, đổi mật khẩu, quản lý hồ sơ chung.
+   - VietMap API (Autocomplete, Reverse Geocoding, Geocode, Static Maps).
+   - Location Session (Mã QR kết nối Mobile-Desktop).
+   - Bảng Xếp Hạng (Leaderboard) toàn hệ thống và theo khu vực.
 
 ---
 
-## Response Format
+## Phân Quyền (Roles & Authorities)
+
+Hệ thống Grevo sử dụng 4 Role chính được cấp phát trong JWT Token:
+
+- `CITIZEN`: Công dân báo cáo rác thải.
+- `ENTERPRISE`: Doanh nghiệp tái chế/thu gom.
+- `COLLECTOR`: Nhân viên lấy rác (thường thuộc một Doanh nghiệp cụ thể).
+- `ADMIN`: Quản trị viên hệ thống.
+
+---
+
+## Response Format Chuẩn
 
 ### Thành công
 ```json
 {
-    "field1": "value1",
-    "field2": "value2"
+    "success": true,
+    "message": "Chi tiết (tùy chọn)",
+    "data": { ... } // (tùy từng endpoint đặc thù có thể trả raw data)
 }
 ```
 
-### Thành công với phân trang
+### Thành công với phân trang (Pageable)
 ```json
 {
     "content": [...],
@@ -172,8 +92,8 @@ Authorization: Bearer <JWT_TOKEN>
 ### Lỗi
 ```json
 {
-    "error": "Mô tả lỗi",
-    "message": "Chi tiết lỗi (optional)"
+    "error": "Tên lỗi (Bad Request, Unauthorized, v.v)",
+    "message": "Mô tả chi tiết nguyên nhân lỗi"
 }
 ```
 
@@ -184,13 +104,13 @@ Authorization: Bearer <JWT_TOKEN>
 | Code | Ý nghĩa |
 |------|---------|
 | 200 | Thành công |
-| 201 | Tạo mới thành công |
+| 201 | Tạo mới thành công (Nhiều API cũ vẫn dùng 200 cho tạo mới) |
 | 204 | Xóa thành công |
-| 400 | Yêu cầu không hợp lệ |
-| 401 | Chưa xác thực |
-| 403 | Không có quyền |
-| 404 | Không tìm thấy |
-| 500 | Lỗi server |
+| 400 | Yêu cầu không hợp lệ (Bad Request) |
+| 401 | Chưa xác thực (Token sai hoặc hết hạn) |
+| 403 | Không có quyền (Sai Role) |
+| 404 | Không tìm thấy Resource |
+| 500 | Lỗi server (Internal Server Error) |
 
 ---
 

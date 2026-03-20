@@ -4,11 +4,11 @@
 
 ---
 
-## 1. Quản Lý Người Dùng
+## 1. Quản Lý Người Dùng (`/api/admin/users`)
 
 ### 1.1. Danh Sách Người Dùng
 
-Lấy danh sách tất cả người dùng trong hệ thống.
+Lấy danh sách tất cả người dùng trong hệ thống (Hỗ trợ phân trang, tìm kiếm, sắp xếp).
 
 #### Request
 
@@ -20,40 +20,21 @@ Authorization: Bearer <JWT_TOKEN>
 **Query Parameters:**
 | Param | Type | Default | Mô tả |
 |-------|------|---------|-------|
-| search | string | null | Tìm theo tên/email |
-| role | string | null | Lọc theo role |
+| search | string | null | Tìm kiếm đa trường (Tên, Email, v.v) |
+| role | string | null | Lọc theo Role người dùng |
 | page | int | 0 | Số trang |
-| size | int | 10 | Số lượng mỗi trang |
-| sort | string | createAt,desc | Sắp xếp |
+| size | int | 10 | Số lượng bản ghi mỗi trang |
+| sort | string | createAt,desc | Cột cần sắp xếp, hướng |
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):**
-```json
-{
-    "content": [
-        {
-            "userId": 1,
-            "fullName": "Nguyễn Văn A",
-            "email": "user@example.com",
-            "phone": "0901234567",
-            "role": "CITIZEN",
-            "isActive": true,
-            "isVerified": true,
-            "avatar": "https://cloudinary.com/avatars/user1.jpg",
-            "createAt": "2026-01-01T00:00:00",
-            "updateAt": "2026-01-20T10:00:00"
-        }
-    ],
-    "totalPages": 10,
-    "totalElements": 95,
-    "number": 0
-}
-```
+Trả về `Page<UserManagementResponse>`.
 
 ---
 
 ### 1.2. Cập Nhật Người Dùng
+
+Cập nhật thông tin của người dùng bởi Admin.
 
 #### Request
 
@@ -63,33 +44,18 @@ Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Body:**
-```json
-{
-    "fullName": "Nguyễn Văn A",
-    "email": "updated@example.com",
-    "phone": "0909123456",
-    "role": "CITIZEN",
-    "isActive": true
-}
-```
+**Body:** (AdminUpdateUserRequest)
+*(Các trường cần cập nhật tùy thuộc vào implementation cụ thể)*
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):**
-```json
-{
-    "userId": 1,
-    "fullName": "Nguyễn Văn A",
-    "email": "updated@example.com",
-    "role": "CITIZEN",
-    "isActive": true
-}
-```
+Trả về `UserManagementResponse` sau cập nhật.
 
 ---
 
 ### 1.3. Xóa Người Dùng
+
+Xóa vĩnh viễn (hoặc soft delete) một người dùng.
 
 #### Request
 
@@ -98,15 +64,15 @@ DELETE /api/admin/users/{userId}
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):** No content
+Không có nội dung trả về (Void).
 
 ---
 
 ### 1.4. Reset Mật Khẩu
 
-Reset mật khẩu về mặc định `123456`.
+Reset mật khẩu của một người dùng về mặc định (`123456`).
 
 #### Request
 
@@ -115,18 +81,19 @@ POST /api/admin/users/{userId}/reset-password
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):**
-```
+```text
 Password reset successfully to 123456
 ```
 
 ---
 
-## 2. Quản Lý Doanh Nghiệp
+## 2. Quản Lý Doanh Nghiệp (`/api/admin/enterprises`)
 
 ### 2.1. Danh Sách Doanh Nghiệp
+
+Lấy toàn bộ danh sách các doanh nghiệp.
 
 #### Request
 
@@ -135,73 +102,20 @@ GET /api/admin/enterprises
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):**
-```json
-[
-    {
-        "enterpriseId": 1,
-        "companyName": "Công ty Thu Gom ABC",
-        "companyPhone": "028-1234567",
-        "companyEmail": "contact@abc.vn",
-        "companyAddress": "456 Đường XYZ, Quận 3",
-        "taxCode": "0123456789",
-        "capacity": 1000,
-        "isActive": true,
-        "user": {
-            "userId": 5,
-            "fullName": "Người quản lý",
-            "email": "manager@abc.vn"
-        },
-        "collectorCount": 15,
-        "totalReports": 500
-    }
-]
-```
+Trả về `List<EnterpriseResponse>`.
 
 ---
 
-## 3. Quản Lý Khu Vực Dịch Vụ
+### 2.2. Cập Nhật Trạng Thái Doanh Nghiệp
 
-### 3.1. Danh Sách Khu Vực
+Thay đổi trạng thái khối/kích hoạt của một doanh nghiệp.
 
 #### Request
 
 ```http
-GET /api/admin/service-areas
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
-```json
-[
-    {
-        "areaId": 1,
-        "areaName": "Quận 1",
-        "city": "TP. Hồ Chí Minh",
-        "district": "Quận 1",
-        "ward": null,
-        "latitude": "10.7769",
-        "longitude": "106.7009",
-        "radius": 5.0,
-        "isActive": true,
-        "enterpriseCount": 3,
-        "reportCount": 150
-    }
-]
-```
-
----
-
-### 3.2. Tạo Khu Vực Mới
-
-#### Request
-
-```http
-POST /api/admin/service-areas
+PUT /api/admin/enterprises/{id}/status
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -209,61 +123,115 @@ Authorization: Bearer <JWT_TOKEN>
 **Body:**
 ```json
 {
-    "areaName": "Quận 7",
-    "city": "TP. Hồ Chí Minh",
-    "district": "Quận 7",
-    "ward": null,
-    "latitude": "10.7340",
-    "longitude": "106.7217",
-    "radius": 3.0,
     "isActive": true
 }
 ```
 
-#### Response
+#### Response (200 OK)
 
-**Success (200):**
 ```json
 {
-    "areaId": 10,
-    "areaName": "Quận 7",
-    "message": "Service area created successfully"
+    "message": "Enterprise status updated successfully",
+    "isActive": true
 }
 ```
 
 ---
 
-### 3.3. Cập Nhật Khu Vực
+## 3. Quản Lý Khu Vực Dịch Vụ Hệ Thống (`/api/admin/areas`)
+
+### 3.1. Danh Sách Khu Vực Hệ Thống
+
+Lấy danh sách tất cả khu vực do hệ thống quản lý.
 
 #### Request
 
 ```http
-PUT /api/admin/service-areas/{areaId}
+GET /api/admin/areas
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+
+Trả về `List<ServiceAreaResponse>`.
+
+---
+
+### 3.2. Tạo Trực Tiếp / Thêm Bằng Truy Vấn (Query) Khu Vực
+
+Tạo mới khu vực dịch vụ bằng 2 mô hình: Gửi đầy đủ thông tin hoặc truy vấn (từ Map API/Goong).
+
+#### Request
+
+```http
+POST /api/admin/areas
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
 
+**Body (Tạo Trực Tiếp):**
+```json
+{
+    "name": "Quận 7",
+    "lat": "10.7340",
+    "lng": "106.7217",
+    "type": "DISTRICT"
+}
+```
+
+**Hoặc Body (Tạo Từ Query - Map Provider):**
+```json
+{
+    "query": "Quận 1, Hồ Chí Minh"
+}
+```
+
+#### Response (200 OK)
+
+Trả về `ServiceAreaResponse`.
+
 ---
 
-### 3.4. Xóa Khu Vực
+### 3.3. Xóa Khu Vực
 
 #### Request
 
 ```http
-DELETE /api/admin/service-areas/{areaId}
+DELETE /api/admin/areas/{id}
 Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+
+```json
+{
+    "message": "Service Area deleted successfully"
+}
 ```
 
 ---
 
-## 4. Phân Quyền Khu Vực - Doanh Nghiệp
+## 4. Phân Quyền Khu Vực - Doanh Nghiệp (`/api/admin/enterprises/{enterpriseId}/areas`)
 
-### 4.1. Gán Doanh Nghiệp Cho Khu Vực
+### 4.1. Xem Các Khu Vực Của Doanh Nghiệp
+
+#### Request
+```http
+GET /api/admin/enterprises/{enterpriseId}/areas
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+Trả về `List<EnterpriseArea>`.
+
+---
+
+### 4.2. Thêm Khu Vực Cho Doanh Nghiệp Bằng Truy Vấn (Query)
 
 #### Request
 
 ```http
-POST /api/admin/enterprise-areas
+POST /api/admin/enterprises/{enterpriseId}/areas
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -271,88 +239,58 @@ Authorization: Bearer <JWT_TOKEN>
 **Body:**
 ```json
 {
-    "enterpriseId": 1,
-    "areaId": 5
+    "query": "Phường 14, Quận 10, TP.HCM"
 }
 ```
 
+#### Response (200 OK)
+
+Trả về đối tượng `EnterpriseArea` mới được thêm.
+
 ---
 
-### 4.2. Xóa Phân Quyền
+### 4.3. Xóa Khu Vực Khỏi Doanh Nghiệp
 
 #### Request
 
 ```http
-DELETE /api/admin/enterprise-areas/{enterpriseAreaId}
+DELETE /api/admin/enterprises/{enterpriseId}/areas/{areaId}
 Authorization: Bearer <JWT_TOKEN>
 ```
 
----
+#### Response (200 OK)
 
-## 5. Nhật Ký Hệ Thống
-
-### 5.1. Xem Nhật Ký
-
-#### Request
-
-```http
-GET /api/admin/system-logs?page=0&size=50
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
 ```json
 {
-    "content": [
-        {
-            "logId": 1,
-            "action": "USER_LOGIN",
-            "userId": 5,
-            "userName": "Nguyễn Văn A",
-            "ipAddress": "192.168.1.100",
-            "details": "Login successful",
-            "createdAt": "2026-01-21T10:00:00"
-        }
-    ],
-    "totalPages": 100,
-    "totalElements": 5000,
-    "number": 0
+    "message": "Area removed successfully"
 }
 ```
 
 ---
 
-## Bảng Điều Khiển Admin
+## 5. Nhật Ký Hệ Thống (`/api/admin/logs`)
 
-### Dashboard Statistics
+### 5.1. Xem Logs
 
-Thống kê tổng quan hệ thống.
+Lấy danh sách log hệ thống có phân trang và tìm kiếm.
 
 #### Request
 
 ```http
-GET /api/admin/dashboard/stats
+GET /api/admin/logs?page=0&size=10&search=Lỗi
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
+**Query Parameters:**
+| Param | Type | Default | Mô tả |
+|-------|------|---------|-------|
+| page | int | 0 | Số trang |
+| size | int | 10 | Số lượng mỗi trang |
+| search | string | null | Tìm trong Level, Action, Message |
 
-**Success (200):**
-```json
-{
-    "totalUsers": 1500,
-    "totalCitizens": 1200,
-    "totalEnterprises": 25,
-    "totalCollectors": 275,
-    "totalReports": 8500,
-    "pendingReports": 150,
-    "completedReports": 7800,
-    "totalPointsAwarded": 250000,
-    "totalVouchersRedeemed": 450
-}
-```
+#### Response (200 OK)
+
+Trả về `Page<SystemLog>`.
 
 ---
 

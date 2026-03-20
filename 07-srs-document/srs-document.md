@@ -346,6 +346,21 @@ graph TB
 | **Actor** | Admin |
 | **Độ ưu tiên** | Trung bình |
 
+### 3.6. Quy Tắc Nghiệp Vụ (Business Rules)
+
+Toàn bộ quy tắc xác thực dữ liệu và logic giới hạn của ứng dụng (đã triển khai):
+
+| Phân loại | Quy tắc (Rule) | Ràng buộc kỹ thuật |
+|-----------|----------------|--------------------|
+| **Tài khoản** | Username (3-50 ký tự, không dấu), Email hợp lệ, SDT (10 số) phải Unique | Valid Regex Pattern |
+| **Mật khẩu** | Tối thiểu 8 ký tự, có chữ Hoa, chữ thường, số, và ký tự đặc biệt | Tự động validate trên BE |
+| **Xóa User** | Collector phải rời doanh nghiệp và gỡ bỏ task trước khi xóa tài khoản | Xóa mềm các Request liên quan |
+| **Báo cáo rác** | Công dân chỉ có tối đa 1 báo cáo đang ở trạng thái PENDING/ASSIGNED/ON_THE_WAY | Kiểm tra trạng thái báo cáo |
+| **Collector Task** | Chỉ có thể Accept/Reject khi ASSIGNED, Complete/Cancel khi ON_THE_WAY | Trạng thái bắt buộc |
+| **Quality Score** | Base: 1-5 sao. Trừ 1đ nếu sai phân loại rác. Trừ 1đ nếu Citizen không hợp tác | Range: 1 -> 5 |
+| **Voucher** | Citizen phải đủ điểm > voucherCost. Voucher phải isActive và còn số lượng (nếu giới hạn) | Point balance check |
+| **Quy tắc điểm** | `Điểm = (Quantity × BasePoints) × QualityMultiplier + Bonus` | Rule Priority cao nhất |
+
 ---
 
 ## 4. Yêu Cầu Phi Chức Năng

@@ -52,7 +52,33 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-### 1.2. Chi Tiết Nhiệm Vụ
+### 1.2. Thống Kê Nhiệm Vụ
+
+Lấy thống kê điểm số và số lượng nhiệm vụ làm trong ngày.
+
+#### Request
+
+```http
+GET /api/collector/tasks/stats
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response
+
+**Success (200):**
+```json
+{
+    "tasksToday": 5,
+    "pendingTasks": 2,
+    "completedTasks": 3,
+    "completionRate": 60.0,
+    "rating": 4.5
+}
+```
+
+---
+
+### 1.3. Chi Tiết Nhiệm Vụ
 
 Xem chi tiết một nhiệm vụ.
 
@@ -100,7 +126,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-### 1.3. Chấp Nhận Nhiệm Vụ
+### 1.4. Chấp Nhận Nhiệm Vụ
 
 Chấp nhận nhiệm vụ và bắt đầu thu gom.
 
@@ -122,16 +148,9 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-**Error - Không phải nhiệm vụ của bạn (400):**
-```json
-{
-    "error": "This task is not assigned to you"
-}
-```
-
 ---
 
-### 1.4. Từ Chối Nhiệm Vụ
+### 1.5. Từ Chối Nhiệm Vụ
 
 Từ chối nhiệm vụ (trước khi chấp nhận).
 
@@ -155,7 +174,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-### 1.5. Hoàn Thành Nhiệm Vụ
+### 1.6. Hoàn Thành Nhiệm Vụ
 
 Đánh dấu nhiệm vụ đã hoàn thành với hình ảnh xác nhận.
 
@@ -170,7 +189,7 @@ Authorization: Bearer <JWT_TOKEN>
 **Form Data:**
 | Field | Type | Required | Mô tả |
 |-------|------|----------|-------|
-| images | file[] | ❌ | Hình ảnh xác nhận thu gom |
+| image | file | ❌ | Hình ảnh xác nhận thu gom |
 | rating | int | ✅ | Đánh giá chất lượng rác (1-5) |
 | wasteSortedCorrectly | boolean | ✅ | Rác được phân loại đúng không |
 | citizenCooperative | boolean | ✅ | Công dân hợp tác không |
@@ -181,24 +200,15 @@ Authorization: Bearer <JWT_TOKEN>
 **Success (200):**
 ```json
 {
-    "reportId": 123,
-    "status": "COLLECTED",
-    "qualityScore": 4,
-    "pointsAwarded": 45,
-    "message": "Task completed successfully!"
-}
-```
-
-**Error - Trạng thái không hợp lệ (400):**
-```json
-{
-    "error": "Can only complete tasks that are ON_THE_WAY"
+    "message": "Task completed successfully",
+    "allCompleted": true,
+    "pointsAwarded": 45
 }
 ```
 
 ---
 
-### 1.6. Hủy Nhiệm Vụ
+### 1.7. Hủy Nhiệm Vụ
 
 Hủy nhiệm vụ (khi không thể hoàn thành).
 
@@ -251,8 +261,7 @@ Authorization: Bearer <JWT_TOKEN>
     "isOnline": true,
     "enterprise": {
         "enterpriseId": 1,
-        "companyName": "Công ty Thu Gom ABC",
-        "companyPhone": "028-1234567"
+        "companyName": "Công ty Thu Gom ABC"
     },
     "rating": 4.5,
     "totalCompletedTasks": 120,
@@ -262,12 +271,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
-### 2.2. Cập Nhật Trạng Thái Online
+### 2.2. Cập Nhật Hồ Sơ
 
 #### Request
 
 ```http
-PUT /api/collector/profile/status
+PUT /api/collector/profile
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -275,30 +284,24 @@ Authorization: Bearer <JWT_TOKEN>
 **Body:**
 ```json
 {
-    "isOnline": true
+    "vehicleType": "Xe máy",
+    "vehiclePlate": "59A1-12345",
+    "maxCapacity": 50.5
 }
 ```
 
 #### Response
 
-**Success (200):**
-```json
-{
-    "message": "Status updated",
-    "isOnline": true
-}
-```
+Trả về đối tượng Profile vừa được cập nhật.
 
 ---
 
-### 2.3. Xin Nghỉ Phép
-
-Gửi yêu cầu nghỉ phép.
+### 2.3. Cập Nhật Trạng Thái Online
 
 #### Request
 
 ```http
-POST /api/collector/profile/request-leave
+POST /api/collector/profile/status
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -306,7 +309,7 @@ Authorization: Bearer <JWT_TOKEN>
 **Body:**
 ```json
 {
-    "reason": "Việc gia đình"
+    "isOnline": true
 }
 ```
 
@@ -315,8 +318,8 @@ Authorization: Bearer <JWT_TOKEN>
 **Success (200):**
 ```json
 {
-    "message": "Leave request submitted",
-    "currentStatus": "PENDING_LEAVE"
+    "message": "Status updated successfully",
+    "isOnline": true
 }
 ```
 
@@ -324,12 +327,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## 3. Doanh Nghiệp
 
-### 3.1. Xem Doanh Nghiệp Hiện Tại
+### 3.1. Trạng Thái Xin Việc
+
+Xem trạng thái xin việc hoặc nghỉ phép hiện tại đối với doanh nghiệp.
 
 #### Request
 
 ```http
-GET /api/collector/enterprise
+GET /api/collector/enterprise/status
 Authorization: Bearer <JWT_TOKEN>
 ```
 
@@ -338,11 +343,14 @@ Authorization: Bearer <JWT_TOKEN>
 **Success (200):**
 ```json
 {
-    "enterpriseId": 1,
-    "companyName": "Công ty Thu Gom ABC",
-    "companyPhone": "028-1234567",
-    "companyEmail": "contact@abc-thugom.vn",
-    "companyAddress": "456 Đường XYZ, Quận 3, TP.HCM"
+    "status": "APPROVED",
+    "enterprise": {
+        "enterpriseId": 1,
+        "companyName": "Công ty Thu Gom ABC",
+        "companyPhone": "028-1234567",
+        "companyEmail": "contact@abc-thugom.vn",
+        "companyAdr": "456 Đường XYZ, Quận 3, TP.HCM"
+    }
 }
 ```
 
@@ -355,7 +363,7 @@ Tìm doanh nghiệp để xin gia nhập.
 #### Request
 
 ```http
-GET /api/collector/enterprise/search?keyword=ABC
+GET /api/collector/enterprise/search?query=ABC
 Authorization: Bearer <JWT_TOKEN>
 ```
 
@@ -367,8 +375,7 @@ Authorization: Bearer <JWT_TOKEN>
     {
         "enterpriseId": 1,
         "companyName": "Công ty Thu Gom ABC",
-        "companyPhone": "028-1234567",
-        "collectorCount": 15
+        "companyPhone": "028-1234567"
     }
 ]
 ```
@@ -380,7 +387,7 @@ Authorization: Bearer <JWT_TOKEN>
 #### Request
 
 ```http
-POST /api/collector/enterprise/request
+POST /api/collector/enterprise/join
 Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -388,8 +395,7 @@ Authorization: Bearer <JWT_TOKEN>
 **Body:**
 ```json
 {
-    "enterpriseId": 1,
-    "message": "Tôi muốn gia nhập công ty"
+    "enterpriseId": 1
 }
 ```
 
@@ -398,30 +404,38 @@ Authorization: Bearer <JWT_TOKEN>
 **Success (200):**
 ```json
 {
-    "message": "Request submitted successfully",
-    "requestStatus": "PENDING"
+    "message": "Request sent successfully",
+    "status": "PENDING"
 }
 ```
 
 ---
 
-### 3.4. Rời Doanh Nghiệp
+### 3.4. Rời Doanh Nghiệp / Xin Nghỉ Phép / Hủy Request
+
+Sử dụng endpoint duy nhất này để xử lý nhiều trạng thái liên quan đến request:
+- Rời doanh nghiệp (với lý do).
+- Xin nghỉ phép (với lý do).
+- Hủy request đang chờ (xin việc).
 
 #### Request
 
 ```http
 POST /api/collector/enterprise/leave
+Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
+```
+
+**Body:**
+```json
+{
+    "reason": "Xin nghỉ phép vì việc gia đình"
+}
 ```
 
 #### Response
 
-**Success (200):**
-```json
-{
-    "message": "You have left the enterprise"
-}
-```
+Trả về message thích hợp tương ứng với kết quả hoặc trạng thái yêu cầu (`status`: `LEAVE_REQUESTED` hoặc `APPROVED` / `NONE`).
 
 ---
 

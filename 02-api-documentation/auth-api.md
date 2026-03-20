@@ -196,6 +196,146 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## 5. Quên Mật Khẩu
+
+Gửi email chứa liên kết để reset mật khẩu.
+
+### Request
+
+```http
+POST /api/auth/forgot-password
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+    "email": "user@example.com"
+}
+```
+
+### Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Password reset email sent. Please check your inbox."
+}
+```
+
+---
+
+## 6. Đặt Lại Mật Khẩu
+
+Đặt lại mật khẩu mới sử dụng token nhận được từ email.
+
+### Request
+
+```http
+POST /api/auth/reset-password
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+    "token": "reset_token_from_email",
+    "newPassword": "newSecurePassword123"
+}
+```
+
+### Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Password has been reset successfully. You can now log in with your new password."
+}
+```
+
+---
+
+## 7. Kiểm Tra Thông Tin (Username/Email/Phone)
+
+Kiểm tra xem tên đăng nhập, email hoặc số điện thoại đã tồn tại trong hệ thống chưa (dùng cho validation form đăng ký).
+
+### Request
+
+```http
+GET /api/auth/check-username?username=user123
+GET /api/auth/check-email?email=user@example.com
+GET /api/auth/check-phone?phone=0901234567
+```
+
+### Response (200 OK)
+
+```json
+{
+    "exists": true
+}
+```
+
+---
+
+## 8. Xác Thực Tài Khoản (Mã OTP)
+
+Xác thực email tài khoản mới đăng ký thông qua mã OTP.
+
+### Request
+
+```http
+POST /api/auth/verify-account
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+    "email": "user@example.com",
+    "otp": "123456"
+}
+```
+
+### Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Account verified successfully."
+}
+```
+
+---
+
+## 9. Gửi Lại Mã Xác Thực
+
+Yêu cầu gửi lại mã OTP vào email.
+
+### Request
+
+```http
+POST /api/auth/resend-verification
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+    "email": "user@example.com"
+}
+```
+
+### Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Verification code sent."
+}
+```
+
+---
+
 ## JWT Token Structure
 
 Token được trả về có cấu trúc JWT chuẩn:

@@ -294,6 +294,100 @@ Bảng chứa thông tin các báo cáo rác thải.
 
 ---
 
+## 18. COLLECTOR_ASSIGNMENTS - Phân Công Thu Gom
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| assignmentId | INT | NO | PK, Auto increment |
+| report_id | INT | NO | FK → waste_reports.reportId |
+| collector_id | INT | NO | FK → collectors.collectorId |
+| allocatedWeight | DOUBLE | NO | Khối lượng được giao (kg) |
+| status | VARCHAR(255) | NO | Trạng thái (ASSIGNED, ON_THE_WAY, COLLECTED, CANCELLED) |
+| assignedAt | DATETIME | YES | Ngày giờ phân công |
+| completedAt | DATETIME | YES | Ngày giờ hoàn thành |
+
+---
+
+## 19. LOCATION_SESSIONS - Phiên Vị Trí
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| sessionId | VARCHAR(36) | NO | PK, ID phiên vị trí |
+| latitude | DOUBLE | YES | Vĩ độ |
+| longitude | DOUBLE | YES | Kinh độ |
+| address | VARCHAR(500) | YES | Địa chỉ chi tiết |
+| status | ENUM | NO | Trạng thái (WAITING) |
+| createdAt | DATETIME | NO | Thời gian tạo |
+| expiresAt | DATETIME | NO | Thời gian hết hạn |
+| userId | BIGINT | YES | ID người dùng |
+
+---
+
+## 20. NOTIFICATION - Thông Báo
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| id | INT | NO | PK, Auto increment |
+| user_id | INT | NO | FK → users.userId |
+| title | VARCHAR(255) | YES | Tiêu đề thông báo |
+| message | TEXT | YES | Nội dung thông báo |
+| isRead | BOOLEAN | YES | Đã đọc (default: false) |
+| type | VARCHAR(255) | YES | Loại thông báo |
+
+---
+
+## 21. REPORT_LIFECYCLE - Vòng Đời Báo Cáo
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| lifecycleId | INT | NO | PK, Auto increment |
+| collector_id | INT | YES | FK → collectors.collectorId |
+| report_id | INT | NO | FK → waste_reports.reportId |
+| enterprise_id | INT | YES | FK → enterprise.enterpriseId |
+| acceptedAt | DATETIME | YES | Thời gian collector chấp nhận |
+| assignedAt | DATETIME | YES | Thời gian phân công |
+| collectedAt | DATETIME | YES | Thời gian thu gom xong |
+
+---
+
+## 22. REWARDS - Phần Thưởng
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| rewardId | INT | NO | PK, Auto increment |
+| citizen_id | INT | NO | FK → citizens.citizenId |
+| report_id | INT | YES | FK → waste_reports.reportId |
+| points | INT | YES | Điểm thưởng |
+| createdAt | DATETIME | YES | Thời gian nhận thưởng |
+
+---
+
+## 23. SAVED_LOCATIONS - Vị Trí Đã Lưu
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| id | INT | NO | PK, Auto increment |
+| user_id | INT | NO | FK → users.userId |
+| label | VARCHAR(255) | NO | Nhãn vị trí |
+| address | VARCHAR(255) | NO | Địa chỉ chi tiết |
+| latitude | VARCHAR(255) | YES | Vĩ độ |
+| longitude | VARCHAR(255) | YES | Kinh độ |
+| createdAt | DATETIME | YES | Thời gian lưu |
+
+---
+
+## 24. STATUS_HISTORY - Lịch Sử Trạng Thái
+
+| Cột | Kiểu dữ liệu | Null | Mô tả |
+|-----|--------------|------|-------|
+| historyId | INT | NO | PK, Auto increment |
+| report_id | INT | NO | FK → waste_reports.reportId |
+| oldStatus | VARCHAR(255) | YES | Trạng thái cũ |
+| newStatus | VARCHAR(255) | YES | Trạng thái mới |
+| changedAt | DATETIME | YES | Thời gian thay đổi |
+
+---
+
 ## Liên Hệ
 
 - **Email**: pnhat.se@gmail.com

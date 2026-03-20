@@ -455,6 +455,83 @@ Tương tự bảng xếp hạng toàn hệ thống.
 
 ---
 
+## 6. Vị Trí Đã Lưu (Saved Locations)
+
+Quản lý các vị trí thường dùng (Nhà, Công ty, v.v.).
+
+### 6.1. Danh Sách Vị Trí Đã Lưu
+
+Lấy danh sách các vị trí đã lưu của người dùng hiện tại.
+
+#### Request
+
+```http
+GET /api/users/saved-locations
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+
+```json
+[
+    {
+        "id": 1,
+        "label": "Nhà",
+        "address": "123 Đường ABC, Quận 1, TP.HCM",
+        "latitude": "10.7769",
+        "longitude": "106.7009"
+    }
+]
+```
+
+---
+
+### 6.2. Thêm Vị Trí Mới
+
+#### Request
+
+```http
+POST /api/users/saved-locations
+Content-Type: application/json
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Body:**
+```json
+{
+    "label": "Công ty",
+    "address": "456 Đường XYZ, Quận 3, TP.HCM",
+    "latitude": "10.7800",
+    "longitude": "106.6900"
+}
+```
+
+#### Response (200 OK)
+
+Trả về đối tượng vừa được tạo.
+
+---
+
+### 6.3. Xóa Vị Trí
+
+#### Request
+
+```http
+DELETE /api/users/saved-locations/{id}
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+
+```json
+{
+    "success": true,
+    "message": "Location deleted successfully"
+}
+```
+
+---
+
 ## Liên Hệ
 
 - **Email**: pnhat.se@gmail.com

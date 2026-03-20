@@ -7,7 +7,7 @@
 | Công nghệ | Phiên bản | Mục đích |
 |-----------|-----------|----------|
 | **Java** | 21 (LTS) | Ngôn ngữ lập trình chính |
-| **Spring Boot** | 4.0.1 | Framework phát triển backend |
+| **Spring Boot** | 3.3.0 | Framework phát triển backend |
 | **Spring Security** | - | Bảo mật, xác thực |
 | **Spring Data JPA** | - | ORM, tương tác database |
 | **Spring Validation** | - | Validate dữ liệu đầu vào |
@@ -32,7 +32,7 @@
 | Công nghệ | Phiên bản | Mục đích |
 |-----------|-----------|----------|
 | **Lombok** | - | Giảm boilerplate code |
-| **SpringDoc OpenAPI** | 2.3.0 | Swagger API documentation |
+| **SpringDoc OpenAPI** | 2.5.0 | Swagger API documentation |
 | **Cloudinary** | 1.36.0 | Lưu trữ hình ảnh cloud |
 
 ### Build & Development
@@ -130,7 +130,7 @@
     
     <!-- Utilities -->
     <dependency>lombok</dependency>
-    <dependency>springdoc-openapi-starter-webmvc-ui (2.3.0)</dependency>
+    <dependency>springdoc-openapi-starter-webmvc-ui (2.5.0)</dependency>
     <dependency>cloudinary-http44 (1.36.0)</dependency>
 </dependencies>
 ```

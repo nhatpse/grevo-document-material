@@ -4,537 +4,323 @@
 
 ---
 
-## 1. Quản Lý Báo Cáo Rác Thải
+## 1. Thông Tin Doanh Nghiệp (Profile & Scope)
 
-### 1.1. Báo Cáo Chờ Xử Lý
-
-Lấy danh sách báo cáo cần phân công trong khu vực phụ trách.
+### 1.1. Xem Thông Tin Hồ Sơ Tâm Cỡ
 
 #### Request
 
 ```http
-GET /api/reports/enterprise?page=0&size=10&sortBy=createdAt&sortDir=desc
+GET /api/enterprises/me
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Query Parameters:**
-| Param | Type | Default | Mô tả |
-|-------|------|---------|-------|
-| page | int | 0 | Số trang |
-| size | int | 10 | Số lượng mỗi trang |
-| sortBy | string | createdAt | Sắp xếp theo trường |
-| sortDir | string | desc | Hướng sắp xếp: `asc`, `desc` |
+#### Response (200 OK)
 
-#### Response
-
-**Success (200):**
 ```json
 {
-    "content": [
-        {
-            "reportId": 123,
-            "title": "Rác thải tái chế khu chung cư",
-            "citizenName": "Nguyễn Văn A",
-            "citizenPhone": "0901234567",
-            "status": "PENDING",
-            "wasteType": "RECYCLABLE",
-            "wasteQuantity": 3.5,
-            "latitude": "10.7769",
-            "longitude": "106.7009",
-            "createdAt": "2026-01-21T06:30:00",
-            "imageUrl": "https://cloudinary.com/images/report123.jpg"
-        }
-    ],
-    "totalPages": 5,
-    "totalElements": 42,
-    "number": 0
+    "enterpriseId": 1,
+    "userId": 10,
+    "companyName": "Công ty Thu Gom ABC",
+    "companyPhone": "028-1234567",
+    "companyEmail": "contact@abc-thugom.vn",
+    "companyAdr": "456 Đường XYZ, Quận 3, TP.HCM",
+    "taxCode": "0123456789",
+    "capacity": 1000,
+    "logoUrl": "https://cloudinary.com/...",
+    "status": "ACTIVE",
+    "isActive": true
 }
 ```
 
 ---
 
-### 1.2. Lịch Sử Báo Cáo
-
-Xem lịch sử các báo cáo đã hoàn thành hoặc hủy.
+### 1.2. Cập Nhật Hồ Sơ
 
 #### Request
 
 ```http
-GET /api/reports/enterprise/history?page=0&size=10
+PUT /api/enterprises/me
+Content-Type: application/json
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
-
-Tương tự như báo cáo chờ xử lý với các trạng thái `COLLECTED` hoặc `CANCELLED`.
-
----
-
-### 1.3. Chi Tiết Báo Cáo
-
-Xem chi tiết một báo cáo.
-
-#### Request
-
-```http
-GET /api/reports/enterprise/{reportId}
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
+**Body:**
 ```json
 {
-    "reportId": 123,
-    "title": "Rác thải tái chế khu chung cư",
-    "description": "Chai nhựa, thùng carton",
-    "status": "ASSIGNED",
-    "wasteType": "RECYCLABLE",
-    "wasteQuantity": 3.5,
-    "qualityScore": null,
-    "latitude": "10.7769",
-    "longitude": "106.7009",
-    "createdAt": "2026-01-21T06:30:00",
-    "assignedAt": "2026-01-21T08:00:00",
-    "itemWeights": [...],
-    "citizenImages": [...],
-    "collectorImages": [...],
-    "citizen": {
-        "citizenId": 1,
-        "fullName": "Nguyễn Văn A",
-        "phone": "0901234567",
-        "email": "user@example.com"
-    },
-    "collector": {
-        "collectorId": 5,
-        "fullName": "Trần Văn B",
-        "phone": "0909123456",
-        "vehicleType": "Xe máy",
-        "vehiclePlate": "59A1-12345"
-    }
+    "companyName": "Công ty Thu Gom ABC Mới",
+    "companyPhone": "028-9999999",
+    "capacity": 1500
 }
 ```
 
+#### Response (200 OK)
+Trả về đối tượng Enterprise đã cập nhật.
+
 ---
 
-### 1.4. Collector Phù Hợp
-
-Lấy danh sách collector có thể phân công cho báo cáo.
+### 1.3. Cập Nhật Logo
 
 #### Request
 
 ```http
-GET /api/reports/enterprise/{reportId}/eligible-collectors
+POST /api/enterprises/me/logo
+Content-Type: multipart/form-data
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
+**Form Data:**
+- `logo` (file): File hình ảnh
 
-**Success (200):**
+---
+
+### 1.4. Lấy Khu Vực Hoạt Động (Scope)
+
+#### Request
+
+```http
+GET /api/enterprises/me/scope
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
 ```json
 [
     {
-        "collectorId": 5,
-        "fullName": "Trần Văn B",
-        "phone": "0909123456",
-        "vehicleType": "Xe máy",
-        "vehiclePlate": "59A1-12345",
-        "maxCapacity": 50,
-        "currentStatus": "AVAILABLE",
-        "isOnline": true,
-        "rating": 4.5,
-        "completedTasks": 120
+        "areaId": 1,
+        "areaName": "Quận 1, TP.HCM",
+        "boundaryData": "..."
     }
 ]
 ```
 
 ---
 
-### 1.5. Phân Công Collector
-
-Phân công collector cho một báo cáo.
+### 1.5. Thêm Khu Vực Hoạt Động
 
 #### Request
 
+```http
+POST /api/enterprises/me/scope
+Content-Type: application/json
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Body:**
+```json
+{
+    "areaId": 2
+}
+```
+
+---
+
+### 1.6. Xóa Khu Vực Khỏi Hoạt Động
+
+#### Request
+
+```http
+DELETE /api/enterprises/me/scope/{areaId}
+Authorization: Bearer <JWT_TOKEN>
+```
+
+---
+
+## 2. Quản Lý Báo Cáo Rác Thải
+
+### 2.1. Thống Kê Báo Cáo Của Doanh Nghiệp
+
+#### Request
+
+```http
+GET /api/reports/enterprise/stats
+Authorization: Bearer <JWT_TOKEN>
+```
+
+#### Response (200 OK)
+```json
+{
+    "totalPending": 5,
+    "totalAssigned": 10,
+    "totalCompleted": 150,
+    "totalCollectors": 20
+}
+```
+
+*(Các endpoint GET reports, GET history, GET chi tiết báo cáo, POST assign, PUT status... giữ nguyên phần còn lại của API reports)*
+
+### 2.2. Báo Cáo Chờ Xử Lý
+```http
+GET /api/reports/enterprise?page=0&size=10&sortBy=createdAt&sortDir=desc
+```
+
+### 2.3. Lịch Sử Báo Cáo
+```http
+GET /api/reports/enterprise/history?page=0&size=10
+```
+
+### 2.4. Chi Tiết Báo Cáo
+```http
+GET /api/reports/enterprise/{reportId}
+```
+
+### 2.5. Collector Phù Hợp
+```http
+GET /api/reports/enterprise/{reportId}/eligible-collectors
+```
+
+### 2.6. Phân Công Collector
 ```http
 POST /api/reports/enterprise/{reportId}/assign
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Body:**
-```json
-{
-    "collectorId": 5
-}
+### 2.7. Phân Công Nhiều Collector
+```http
+POST /api/reports/enterprise/{reportId}/multi-assign
 ```
 
-#### Response
-
-**Success (200):**
-```json
-{
-    "reportId": 123,
-    "status": "ASSIGNED",
-    "assignedAt": "2026-01-21T08:00:00",
-    "collector": {
-        "collectorId": 5,
-        "fullName": "Trần Văn B"
-    }
-}
-```
-
----
-
-### 1.6. Cập Nhật Trạng Thái Báo Cáo
-
-Cập nhật trạng thái báo cáo thủ công.
-
-#### Request
-
+### 2.8. Cập Nhật Trạng Thái Báo Cáo
 ```http
 PUT /api/reports/enterprise/{reportId}/status
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
-
-**Body:**
-```json
-{
-    "status": "CANCELLED"
-}
-```
-
-**Các trạng thái hợp lệ:**
-- `PENDING`
-- `CANCELLED`
 
 ---
 
-## 2. Quản Lý Nhân Viên Thu Gom
+## 3. Quản Lý Nhân Viên Thu Gom
 
-### 2.1. Danh Sách Collector
-
-Lấy danh sách collector thuộc doanh nghiệp.
+### 3.1. Danh Sách Collector
 
 #### Request
 
 ```http
-GET /api/enterprise/collectors?status=ACTIVE&search=Trần
+GET /api/enterprises/me/collectors?status=ACTIVE&search=Trần
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Query Parameters:**
 | Param | Type | Mô tả |
 |-------|------|-------|
-| status | string | `ACTIVE`, `PENDING`, `PENDING_LEAVE`, `INACTIVE` |
-| search | string | Tìm theo tên |
+| status | string | `ACTIVE`, `PENDING`, `LEAVE_REQUESTED` |
+| search | string | Tìm theo tên, email, phone |
 
-#### Response
-
-**Success (200):**
+#### Response (200 OK)
 ```json
 [
     {
-        "collectorId": 5,
+        "id": 5,
         "userId": 10,
         "fullName": "Trần Văn B",
         "email": "tranvanb@email.com",
         "phone": "0909123456",
-        "avatar": "https://cloudinary.com/avatars/user10.jpg",
         "vehicleType": "Xe máy",
         "vehiclePlate": "59A1-12345",
         "maxCapacity": 50,
-        "currentStatus": "AVAILABLE",
-        "isOnline": true,
-        "leaveReason": null,
-        "rating": 4.5,
-        "completedTasks": 120
+        "currentStatus": "ACTIVE",
+        "status": "APPROVED",
+        "lastActiveAt": "2026-01-21T10:00:00"
     }
 ]
 ```
 
 ---
 
-### 2.2. Duyệt Yêu Cầu Tham Gia
-
-Duyệt collector muốn gia nhập doanh nghiệp.
+### 3.2. Duyệt Yêu Cầu Tham Gia
 
 #### Request
 
 ```http
-POST /api/enterprise/collectors/{collectorId}/approve
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
-```json
-{
-    "message": "Collector approved successfully",
-    "collectorId": 5
-}
-```
-
----
-
-### 2.3. Từ Chối/Xóa Collector
-
-Từ chối yêu cầu hoặc xóa collector khỏi doanh nghiệp.
-
-#### Request
-
-```http
-DELETE /api/enterprise/collectors/{collectorId}
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
-```json
-{
-    "message": "Collector removed successfully"
-}
-```
-
----
-
-### 2.4. Duyệt Nghỉ Phép
-
-Duyệt yêu cầu nghỉ phép của collector.
-
-#### Request
-
-```http
-POST /api/enterprise/collectors/{collectorId}/approve-leave
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
-```json
-{
-    "message": "Leave request approved"
-}
-```
-
----
-
-### 2.5. Từ Chối Nghỉ Phép
-
-#### Request
-
-```http
-POST /api/enterprise/collectors/{collectorId}/reject-leave
+POST /api/enterprises/me/collectors/{collectorId}/approve
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 ---
 
-## 3. Quản Lý Voucher
-
-### 3.1. Danh Sách Voucher
-
-Lấy danh sách voucher của doanh nghiệp.
+### 3.3. Từ Chối Yêu Cầu Tham Gia / Xóa Collector
 
 #### Request
 
+```http
+POST /api/enterprises/me/collectors/{collectorId}/reject
+Authorization: Bearer <JWT_TOKEN>
+```
+
+---
+
+### 3.4. Duyệt Nghỉ Phép
+
+#### Request
+
+```http
+POST /api/enterprises/me/collectors/{collectorId}/approve-leave
+Authorization: Bearer <JWT_TOKEN>
+```
+
+---
+
+### 3.5. Từ Chối Nghỉ Phép
+
+#### Request
+
+```http
+POST /api/enterprises/me/collectors/{collectorId}/reject-leave
+Authorization: Bearer <JWT_TOKEN>
+```
+
+---
+
+## 4. Quản Lý Voucher
+
+*(Quản lý voucher sử dụng chung endpoint `/api/enterprise/vouchers`)*
+
+### 4.1. Danh Sách Voucher
 ```http
 GET /api/enterprise/vouchers
-Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
-
-**Success (200):**
-```json
-[
-    {
-        "voucherId": 1,
-        "enterpriseName": "ABC Mart",
-        "title": "Giảm 50,000đ",
-        "description": "Áp dụng cho đơn hàng từ 200,000đ",
-        "pointsCost": 500,
-        "quantity": 100,
-        "redeemedCount": 45,
-        "remainingStock": 55,
-        "validFrom": "2026-01-01",
-        "validUntil": "2026-12-31",
-        "isActive": true,
-        "isAvailable": true,
-        "imageUrl": "https://cloudinary.com/vouchers/abc_mart.jpg",
-        "createdAt": "2026-01-01T00:00:00"
-    }
-]
-```
-
----
-
-### 3.2. Tạo Voucher Mới
-
-#### Request
-
+### 4.2. Tạo Voucher Mới
 ```http
 POST /api/enterprise/vouchers
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Body:**
-```json
-{
-    "title": "Giảm 100,000đ",
-    "description": "Áp dụng cho đơn hàng từ 500,000đ",
-    "pointsCost": 1000,
-    "quantity": 50,
-    "validFrom": "2026-02-01",
-    "validUntil": "2026-06-30",
-    "isActive": true,
-    "imageUrl": "https://cloudinary.com/vouchers/new_voucher.jpg"
-}
-```
-
----
-
-### 3.3. Cập Nhật Voucher
-
-#### Request
-
+### 4.3. Cập Nhật Voucher
 ```http
 PUT /api/enterprise/vouchers/{voucherId}
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
 
----
-
-### 3.4. Xóa Voucher
-
-#### Request
-
+### 4.4. Xóa Voucher
 ```http
 DELETE /api/enterprise/vouchers/{voucherId}
-Authorization: Bearer <JWT_TOKEN>
 ```
 
----
-
-### 3.5. Lịch Sử Đổi Voucher
-
-Xem lịch sử công dân đổi voucher.
-
-#### Request
-
+### 4.5. Lịch Sử Đổi Voucher
 ```http
 GET /api/enterprise/vouchers/{voucherId}/redemptions
-Authorization: Bearer <JWT_TOKEN>
-```
-
-#### Response
-
-**Success (200):**
-```json
-[
-    {
-        "redemptionId": 1,
-        "voucherTitle": "Giảm 50,000đ",
-        "voucherDescription": "...",
-        "citizenName": "Nguyễn Văn A",
-        "pointsSpent": 500,
-        "redemptionCode": "ABC123XYZ789",
-        "status": "ACTIVE",
-        "redeemedAt": "2026-01-20T15:30:00",
-        "usedAt": null
-    }
-]
 ```
 
 ---
 
-## 4. Quy Tắc Tính Điểm
+## 5. Quy Tắc Tính Điểm
 
-### 4.1. Danh Sách Quy Tắc
+*(Quy tắc điểm sử dụng chung endpoint `/api/enterprise/point-rules`)*
 
-#### Request
-
+### 5.1. Danh Sách Quy Tắc
 ```http
 GET /api/enterprise/point-rules
-Authorization: Bearer <JWT_TOKEN>
 ```
 
-#### Response
-
-**Success (200):**
-```json
-[
-    {
-        "ruleId": 1,
-        "ruleName": "Điểm cơ bản cho rác tái chế",
-        "description": "Tính điểm cho mỗi kg rác tái chế",
-        "wasteTypeName": "RECYCLABLE",
-        "basePointsPerKg": 10.0,
-        "qualityBonusMultiplier": 1.5,
-        "minQuantityForBonus": 5.0,
-        "quantityBonus": 20,
-        "isActive": true,
-        "priority": 1,
-        "createdAt": "2026-01-01T00:00:00"
-    }
-]
-```
-
----
-
-### 4.2. Tạo Quy Tắc Mới
-
-#### Request
-
+### 5.2. Tạo Quy Tắc Mới
 ```http
 POST /api/enterprise/point-rules
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Body:**
-```json
-{
-    "ruleName": "Điểm bonus cho rác nguy hại",
-    "description": "Bonus thêm cho rác nguy hại được phân loại đúng",
-    "wasteTypeId": 3,
-    "basePointsPerKg": 15.0,
-    "qualityBonusMultiplier": 2.0,
-    "minQuantityForBonus": 2.0,
-    "quantityBonus": 30,
-    "isActive": true,
-    "priority": 2
-}
-```
-
----
-
-### 4.3. Cập Nhật Quy Tắc
-
-#### Request
-
+### 5.3. Cập Nhật Quy Tắc
 ```http
 PUT /api/enterprise/point-rules/{ruleId}
-Content-Type: application/json
-Authorization: Bearer <JWT_TOKEN>
 ```
 
----
-
-### 4.4. Xóa Quy Tắc
-
-#### Request
-
+### 5.4. Xóa Quy Tắc
 ```http
 DELETE /api/enterprise/point-rules/{ruleId}
-Authorization: Bearer <JWT_TOKEN>
 ```
 
 ---
