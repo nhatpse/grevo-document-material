@@ -1,0 +1,31 @@
+flowchart TB
+    subgraph Public["🌐 Public Pages"]
+        HOME[Landing Page]
+        TERMS[Terms of Service]
+        PRIVACY[Privacy Policy]
+    end
+
+    subgraph Auth["🔐 Authentication"]
+        LOGIN[Login / Register]
+        VERIFY[Verify Account]
+        FORGOT[Forgot Password]
+        RESET[Reset Password]
+        GOOGLE[Google OAuth]
+    end
+
+    subgraph Roles["👥 Role-Based Dashboards"]
+        ADMIN["🛡 Admin Dashboard"]
+        ENT["🏭 Enterprise Dashboard"]
+        COL["🚛 Collector Dashboard"]
+        CIT["👤 Citizen Dashboard"]
+    end
+
+    HOME --> LOGIN
+    LOGIN --> VERIFY --> LOGIN
+    LOGIN --> FORGOT --> RESET --> LOGIN
+    LOGIN --> GOOGLE --> VERIFY
+
+    LOGIN -->|role=ADMIN| ADMIN
+    LOGIN -->|role=ENTERPRISE| ENT
+    LOGIN -->|role=COLLECTOR| COL
+    LOGIN -->|role=CITIZEN| CIT

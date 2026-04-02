@@ -2575,6 +2575,18 @@
           "notNull": false,
           "increment": false,
           "comment": ""
+        },
+        {
+          "id": "vrsn_col_asgn_1",
+          "name": "version",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": "Optimistic locking (JPA @Version)"
         }
       ],
       "indices": [],

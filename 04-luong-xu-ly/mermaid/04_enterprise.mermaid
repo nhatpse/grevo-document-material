@@ -1,0 +1,76 @@
+flowchart TD
+    subgraph EntDash["🏠 Enterprise Dashboard /dashboard"]
+        ES["Stats Grid: Collectors, Reports, Collected Today, Avg Rating"]
+        EC["Collector Chart: Online vs Offline"]
+        ER["Revenue Chart: Reports theo thời gian"]
+        EA["Recent Activity: Last 10 events"]
+    end
+
+    subgraph Reports["📊 Waste Reports /enterprise/reports"]
+        WR1[Xem bảng reports trong khu vực quản lý]
+        WR2["Filter: status, waste type, area"]
+        WR3[Search theo citizen name / address]
+        WR4["Sort: newest, oldest, weight"]
+        WR5["Click report → View Report Modal"]
+    end
+
+    subgraph ReportDetail["📋 Report Detail Modal"]
+        RD1["Header: status badge, timestamps"]
+        RD2["Mini Map with Route: citizen → collector"]
+        RD3["Participants: Citizen + Collector cards"]
+        RD4[Multi-collector dropdown list]
+        RD5["Action Panel: Assign Collector"]
+    end
+
+    subgraph Assign["🚛 Assign Collector"]
+        AS1[Xem danh sách Eligible Collectors]
+        AS2["Auto-suggest: Fill smallest first"]
+        AS3[Manual: chọn collectors + allocate weight]
+        AS4["Single assign: 1 collector, full weight"]
+        AS5["Multi assign: N collectors, split weight"]
+        AS6[POST /api/reports/enterprise/:id/multi-assign]
+    end
+
+    subgraph Collectors["👷 Collector Management /enterprise/collectors"]
+        CM1[Xem danh sách collectors]
+        CM2["Stats: Total, Online, Offline, Pending"]
+        CM3["Filter: All, Online, Offline, Pending Requests"]
+        CM4["Invite Collector → Modal nhập email"]
+        CM5[View Collector Detail Modal]
+        CM6[Accept / Reject join request]
+        CM7[Remove collector]
+        CM8[Bulk delete collectors]
+    end
+
+    subgraph Rewards["🎁 Rewards Management /enterprise/rewards"]
+        RW1["Tab Vouchers: CRUD vouchers + upload image"]
+        RW2["Tab Point Rules: CRUD point calculation rules"]
+        RW3["Tab Leaderboard: xem citizen rankings"]
+        RW4["Stats: Total vouchers, Active, Redeemed, Rules"]
+        RW5[View Redemption History per voucher]
+    end
+
+    subgraph Scope["🗺 Operating Scope"]
+        SC1[Xem assigned areas trên map]
+        SC2[Danh sách areas từ Admin]
+    end
+
+    subgraph EntProfile["🏢 Enterprise Profile /profile"]
+        EP1["Company Info: name, email, phone, tax, logo"]
+        EP2[Edit Company Profile]
+        EP3[Upload Company Logo]
+    end
+
+    EntDash --> Reports
+    EntDash --> Collectors
+    EntDash --> Rewards
+    EntDash --> Scope
+    EntDash --> EntProfile
+
+    WR5 --> ReportDetail
+    RD5 --> Assign
+
+    AS1 --> AS2
+    AS2 --> AS3
+    AS3 --> AS6
+    AS4 --> AS6

@@ -1,0 +1,24 @@
+flowchart TD
+    subgraph ProfileFlow["👤 Profile Management"]
+        P_VIEW[Xem Profile Sidebar]
+        P_EDIT["Edit Profile Modal: name, phone, address"]
+        P_AVATAR[Upload / Remove Avatar]
+        P_LOC["Saved Locations: CRUD + address autocomplete"]
+        P_COMPLETION["Profile Completion %: Hiện progress bar"]
+    end
+
+    subgraph SettingsFlow["⚙️ Settings"]
+        S_PWD["Change Password: verify old → set new"]
+        S_EMAIL["Change Email: send code → verify OTP"]
+        S_DELETE["Delete Account: confirm password"]
+    end
+
+    subgraph FeedbackFlow["💬 System Feedback"]
+        F_SUBMIT["Submit: category + rating + subject + description + images"]
+        F_HISTORY[Xem feedback history]
+        F_RESPONSE[Xem admin response]
+    end
+
+    P_VIEW --> P_EDIT
+    P_VIEW --> P_AVATAR
+    P_VIEW --> P_LOC

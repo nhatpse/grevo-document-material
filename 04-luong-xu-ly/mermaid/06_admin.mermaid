@@ -1,0 +1,61 @@
+flowchart TD
+    subgraph AdminDash["🏠 Admin Dashboard /dashboard"]
+        ADS["Stats: Total Users, Active, Enterprise, Reports"]
+        ADR["Role Distribution: pie chart"]
+        ADM2["Areas Map: tất cả service areas"]
+        ADL["Recent Logs: 5 logs gần nhất"]
+    end
+
+    subgraph Users["👥 User Management /admin/users"]
+        UM1["Bảng tất cả users, paginated"]
+        UM2["Tabs: All, Citizen, Enterprise, Collector, Admin"]
+        UM3[Search by name/email/phone]
+        UM4["Click user → Edit User Modal"]
+        UM5[Toggle active/inactive status]
+        UM6[Bulk select + Bulk delete]
+        UM7["Stats: Total, Active, Verified, Disabled"]
+    end
+
+    subgraph Areas["🗺 System Areas /admin/areas"]
+        SA1[Bảng service areas]
+        SA2["Create area: name + code + polygon trên map"]
+        SA3[MapLibre draw polygon]
+        SA4[Edit area]
+        SA5[Delete area]
+    end
+
+    subgraph EntControl["🏭 Enterprise Control /admin/enterprises"]
+        EC1[Bảng tất cả enterprises]
+        EC2["Stats: Total, Active, Inactive, Areas Count"]
+        EC3["Tabs: All, Active, Inactive"]
+        EC4[Search by company name]
+        EC5[Toggle enterprise status]
+        EC6[Assign Area to Enterprise]
+        EC7[Remove Area from Enterprise]
+        EC8[Bulk delete enterprises]
+    end
+
+    subgraph Logs["📜 System Logs /admin/logs"]
+        SL1[Bảng activity logs]
+        SL2["Filter: All, Info, Warning, Error"]
+        SL3[Search by action/message]
+        SL4[Auto-refresh]
+    end
+
+    subgraph SysFeedback["💬 System Feedbacks /admin/feedbacks"]
+        SF1[Bảng user feedbacks]
+        SF2["Tabs: All, New, Reviewed"]
+        SF3["Click → Feedback Detail Modal"]
+        SF4["Change status NEW → REVIEWED"]
+        SF5[Write admin response]
+        SF6[Bulk delete feedbacks]
+    end
+
+    AdminDash --> Users
+    AdminDash --> Areas
+    AdminDash --> EntControl
+    AdminDash --> Logs
+    AdminDash --> SysFeedback
+
+    EC6 -->|"POST admin/enterprises/:id/areas"| SA1
+    EC7 -->|"DELETE admin/enterprises/:id/areas/:areaId"| SA1

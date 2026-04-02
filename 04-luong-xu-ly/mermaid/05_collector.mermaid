@@ -1,0 +1,83 @@
+flowchart TD
+    subgraph ColDash["🏠 Collector Dashboard /dashboard"]
+        CDS["Stats: Today Collections, Capacity, Rating, Tasks"]
+        CDC["Status Card: Online/Offline toggle"]
+        CDI["Identity Card: name, vehicle, enterprise"]
+        CDT["My Tasks Card: shortcut to tasks"]
+        CDA["Active Task: current ON_THE_WAY task with map"]
+        CDR["Recent Collections: last 5 completed"]
+    end
+
+    subgraph Tasks["📋 My Tasks /collector/tasks"]
+        T1["Tabs: Assigned / On The Way / Collected"]
+        T2["Task Cards: address, weight, distance, status"]
+        T3["Click card → Task Detail expandable"]
+        T4["Task Detail: citizen info, waste info, evidence, map"]
+    end
+
+    subgraph TaskActions["⚡ Task Actions"]
+        TA1["Accept Task → POST /api/collector/tasks/:id/accept"]
+        TA2["Assignment status → ON_THE_WAY"]
+        TA3[Navigate to Route Map]
+        TA4["Reject Task → POST /api/collector/tasks/:id/reject"]
+        TA5["Assignment status → CANCELLED"]
+    end
+
+    subgraph RouteMap["🗺 Route Map /collector/route-map"]
+        RM1["Single Dest Mode: từ task accept URL params"]
+        RM2["Multi Dest Mode: fetch all ON_THE_WAY tasks"]
+        RM3["Address Input: set origin location"]
+        RM4["Task Selector: checkbox multiple tasks"]
+        RM5[Calculate Route via GraphHopper API]
+        RM6[Display route on MapLibre GL map]
+        RM7[Turn-by-turn directions panel]
+        RM8["Navigation mode: step-by-step"]
+    end
+
+    subgraph Complete["✅ Complete Task"]
+        CP1[Click Collected button]
+        CP2[Complete Task Modal]
+        CP3[Upload proof photo]
+        CP4[Rate citizen 1-5 stars]
+        CP5["Survey: waste sorted? citizen cooperative?"]
+        CP6[GPS auto-capture location]
+        CP7[POST /api/collector/tasks/:id/complete]
+        CP8["Backend: evaluate terminal state"]
+        CP9{All assignments terminal?}
+        CP10["Report → COLLECTED + Award Points"]
+        CP11[Report stays ON_THE_WAY]
+    end
+
+    subgraph Enterprise["🏭 My Enterprise /collector/enterprise"]
+        ME1[Xem Enterprise info card]
+        ME2[Search Enterprise để join]
+        ME3["Send Join Request → POST /api/collector/enterprise/join"]
+        ME4[View Pending Request status]
+        ME5[Cancel Pending Request]
+        ME6["Leave Enterprise → POST /api/collector/enterprise/leave"]
+        ME7["View Invitations + Accept/Reject"]
+    end
+
+    subgraph ColInfo["ℹ️ Collector Info /collector/info"]
+        CI1["Fill: vehicle type, plate number, max capacity"]
+        CI2[PUT /api/collector/profile]
+    end
+
+    ColDash --> Tasks
+    ColDash --> RouteMap
+    ColDash --> Enterprise
+    ColDash --> ColInfo
+
+    T3 --> TaskActions
+    TA1 --> TA2 --> TA3
+    TA3 --> RouteMap
+
+    RM1 --> RM5
+    RM2 --> RM4 --> RM5
+    RM5 --> RM6 --> RM7 --> RM8
+
+    RM7 --> CP1 --> CP2
+    CP2 --> CP3 --> CP4 --> CP5 --> CP7
+    CP7 --> CP8 --> CP9
+    CP9 -->|"Yes + fully collected"| CP10
+    CP9 -->|"No / partial"| CP11

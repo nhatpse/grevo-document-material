@@ -1,0 +1,65 @@
+flowchart TD
+    subgraph CitDash["🏠 Citizen Dashboard /dashboard"]
+        CS["Stats Section: Tổng report, Pending, Collected, Points"]
+        CA["Active Request Card: Hiện report đang xử lý + Map collector"]
+        CR["Recent Activity: 5 report gần nhất"]
+        CRW["Rewards Section: Vouchers, Points"]
+    end
+
+    subgraph Report["📝 Report Waste /report-waste"]
+        R1[Chọn vị trí trên Map / GPS / Saved Location]
+        R2[Chọn Waste Type + Size + Quantity]
+        R3[Upload ảnh rác]
+        R4[Ghi chú mô tả]
+        R5["Submit → POST /api/reports"]
+    end
+
+    subgraph History["📋 History /history"]
+        H1[Xem danh sách report]
+        H2["Filter theo status: All, Pending, Assigned, On The Way, Collected"]
+        H3["Sort: Newest, Oldest"]
+        H4[Search theo address/description]
+        H5["Click report → Modal chi tiết"]
+        H6["Thấy: ảnh, vị trí, collector info, rating, timeline"]
+    end
+
+    subgraph Points["⭐ Points & Rewards /points"]
+        P1["Tab Point History: Lịch sử tích điểm + tổng hợp tuần"]
+        P2["Tab Rewards Store: Duyệt voucher available"]
+        P3["Tab My Vouchers: Voucher đã đổi"]
+        P4["Tab Leaderboard: Xếp hạng citizen theo điểm tuần"]
+        P5["Redeem Voucher: POST /api/rewards/redeem/:voucherId"]
+    end
+
+    subgraph Profile["👤 Profile /profile"]
+        PF1[Xem Profile Info]
+        PF2["Edit Profile → Modal"]
+        PF3[Upload Avatar]
+        PF4["Saved Locations: Add / Delete"]
+        PF5[Enterprise Section cho collector]
+    end
+
+    subgraph Settings["⚙️ Settings /settings"]
+        S1[Change Password]
+        S2[Change Email + OTP Verify]
+        S3[Delete Account]
+    end
+
+    subgraph Feedback["💬 System Feedback"]
+        FB1["Submit Feedback → POST /api/system-feedbacks"]
+        FB2[View My Feedback History]
+        FB3[Xem Admin Response]
+    end
+
+    CitDash --> Report
+    CitDash --> History
+    CitDash --> Points
+    CitDash --> Profile
+    CitDash --> Settings
+    CitDash --> Feedback
+
+    R1 --> R2 --> R3 --> R4 --> R5
+    R5 -->|Thành công| H1
+
+    P2 --> P5
+    P5 -->|Đủ điểm| P3

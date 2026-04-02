@@ -1,0 +1,37 @@
+flowchart TD
+    A[User mở /login] --> B{Có tài khoản?}
+    B -->|Có| C[Nhập email + password]
+    B -->|Không| D[Chuyển tab Register]
+
+    C --> E{Đã verify email?}
+    E -->|Chưa| F[Redirect /verify-account]
+    E -->|Rồi| G{Check role}
+
+    D --> H[Nhập full_name + email + password + phone + address + role]
+    H --> I[POST /api/auth/register]
+    I --> J[Gửi verification code qua email]
+    J --> F
+
+    F --> K[Nhập OTP 6 số]
+    K --> L[POST /api/auth/verify]
+    L -->|Thành công| M[Redirect /login]
+    L -->|Sai/Hết hạn| N[Resend OTP]
+
+    G -->|CITIZEN| CIT["/dashboard"]
+    G -->|ENTERPRISE| ENT["/dashboard"]
+    G -->|COLLECTOR| COL["/dashboard"]
+    G -->|ADMIN| ADM["/dashboard"]
+
+    C2[Google Sign-In] --> C3[POST /api/auth/google]
+    C3 --> C4{User tồn tại?}
+    C4 -->|Có| G
+    C4 -->|Không| C5[Tạo user mới + auto-verify]
+    C5 --> G
+
+    FP[Forgot Password] --> FP1[Nhập email]
+    FP1 --> FP2[POST /api/auth/forgot-password]
+    FP2 --> FP3[Gửi reset link qua email]
+    FP3 --> FP4["User click link → /reset-password?token=xxx"]
+    FP4 --> FP5[Nhập new password]
+    FP5 --> FP6[POST /api/auth/reset-password]
+    FP6 --> M
